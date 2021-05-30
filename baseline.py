@@ -4,11 +4,12 @@ import os
 import time
 import numpy as np
 import pandas as pd
-import tensorflow.compat.v1 as tf
+import tensorflow._api.v2.compat.v1 as tf
 from tensorflow import feature_column as fc
 from comm import ACTION_LIST, STAGE_END_DAY, FEA_COLUMN_LIST
 from evaluation import uAUC, compute_weighted_score
 
+ACTION_LIST = ['read_comment']
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS

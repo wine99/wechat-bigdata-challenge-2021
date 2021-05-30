@@ -1,0 +1,10 @@
+task_num: 4
+exp_per_task: 4
+shared_num: 8
+expert_size: 32
+tower_size: 8
+level_number: 4
+
+batch_size: 128
+num_epochs: 5
+lr: 0.001

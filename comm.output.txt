@@ -1,0 +1,151 @@
+./data\wechat_algo_data1\user_action.csv statis: 
+             userid        feedid         date_        device  read_comment  \
+count  7.317882e+06  7.317882e+06  7.317882e+06  7.317882e+06  7.317882e+06   
+mean   1.249679e+05  5.669863e+04  7.801455e+00  1.765396e+00  3.501587e-02   
+std    7.239444e+04  3.278194e+04  4.063833e+00  4.237514e-01  1.838199e-01   
+min    8.000000e+00  0.000000e+00  1.000000e+00  1.000000e+00  0.000000e+00   
+25%    6.133000e+04  2.814900e+04  4.000000e+00  2.000000e+00  0.000000e+00   
+50%    1.256370e+05  5.682500e+04  8.000000e+00  2.000000e+00  0.000000e+00   
+75%    1.878630e+05  8.522900e+04  1.100000e+01  2.000000e+00  0.000000e+00   
+max    2.502360e+05  1.128710e+05  1.400000e+01  2.000000e+00  1.000000e+00   
+            comment          like          play          stay  click_avatar  \
+count  7.317882e+06  7.317882e+06  7.317882e+06  7.317882e+06  7.317882e+06   
+mean   4.046253e-04  2.580487e-02  2.631760e+04  3.101158e+04  7.533327e-03   
+std    2.011123e-02  1.585528e-01  6.477679e+04  1.013239e+05  8.646720e-02   
+min    0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00   
+25%    0.000000e+00  0.000000e+00  2.017000e+03  5.189000e+03  0.000000e+00   
+50%    0.000000e+00  0.000000e+00  1.328900e+04  1.782900e+04  0.000000e+00   
+75%    0.000000e+00  0.000000e+00  3.600000e+04  4.133900e+04  0.000000e+00   
+max    1.000000e+00  1.000000e+00  3.855337e+07  8.262444e+07  1.000000e+00   
+            forward        follow      favorite  
+count  7.317882e+06  7.317882e+06  7.317882e+06  
+mean   3.821188e-03  7.211103e-04  1.342465e-03  
+std    6.169754e-02  2.684381e-02  3.661506e-02  
+min    0.000000e+00  0.000000e+00  0.000000e+00  
+25%    0.000000e+00  0.000000e+00  0.000000e+00  
+50%    0.000000e+00  0.000000e+00  0.000000e+00  
+75%    0.000000e+00  0.000000e+00  0.000000e+00  
+max    1.000000e+00  1.000000e+00  1.000000e+00  
+Distinct count:
+userid           20000
+feedid           96564
+date_               14
+device               2
+read_comment         2
+comment              2
+like                 2
+play            201721
+stay            220343
+click_avatar         2
+forward              2
+follow               2
+favorite             2
+dtype: int64
+./data\wechat_algo_data1\feed_info.csv statis: 
+              feedid       authorid  videoplayseconds   bgm_song_id  \
+count  106444.000000  106444.000000     106444.000000  53462.000000   
+mean    56443.543704    9488.196639         34.446545  12556.594946   
+std     32582.304899    5384.927792        277.086122   7319.430812   
+min         0.000000       0.000000          2.000000      0.000000   
+25%     28243.750000    4844.750000         14.000000   6137.000000   
+50%     56419.500000    9584.000000         26.000000  12518.500000   
+75%     84659.250000   14122.000000         54.000000  18965.750000   
+max    112871.000000   18788.000000      59960.000000  25158.000000   
+       bgm_singer_id  
+count   53462.000000  
+mean     8795.041338  
+std      5023.494371  
+min         0.000000  
+25%      4589.250000  
+50%      8614.000000  
+75%     13218.000000  
+max     17499.000000  
+Distinct count:
+feedid                  106444
+authorid                 18789
+videoplayseconds            76
+description              99526
+ocr                      76148
+asr                      70969
+bgm_song_id              25159
+bgm_singer_id            17500
+manual_keyword_list      49460
+machine_keyword_list     54800
+manual_tag_list           3314
+machine_tag_list        105819
+description_char         99416
+ocr_char                 75760
+asr_char                 70969
+dtype: int64
+./data\wechat_algo_data1\test_a.csv statis: 
+              userid         feedid         device
+count  421985.000000  421985.000000  421985.000000
+mean   124695.072128   57071.963089       1.752171
+std     72321.066783   32436.065649       0.431752
+min        25.000000       0.000000       1.000000
+25%     61122.000000   29674.000000       2.000000
+50%    126473.000000   57114.000000       2.000000
+75%    188144.000000   84952.000000       2.000000
+max    250224.000000  112871.000000       2.000000
+Distinct count:
+userid     9757
+feedid    35157
+device        2
+dtype: int64
+2021-05-24 15:34:55,863 - INFO - Create dir and check file
+Create dir: ./data\offline_train
+Create dir: ./data\online_train
+Create dir: ./data\evaluate
+Create dir: ./data\submit
+Create dir: ./data\feature
+Create dir: ./data\model
+Create dir: ./data\model/online_train
+Create dir: ./data\model/offline_train
+2021-05-24 15:34:55,887 - INFO - Generate statistic feature
+userid
+Save to: ./data\feature\userid_feature.csv
+feedid
+Save to: ./data\feature\feedid_feature.csv
+2021-05-24 15:35:29,613 - INFO - Stage: online_train
+2021-05-24 15:35:29,613 - INFO - Generate sample
+Save to: ./data\online_train\online_train_read_comment_14_generate_sample.csv
+Save to: ./data\online_train\online_train_like_14_generate_sample.csv
+Save to: ./data\online_train\online_train_click_avatar_14_generate_sample.csv
+Save to: ./data\online_train\online_train_forward_14_generate_sample.csv
+2021-05-24 15:35:49,076 - INFO - Concat sample with feature
+action:  read_comment
+Save to: ./data\online_train\online_train_read_comment_14_concate_sample.csv
+action:  like
+Save to: ./data\online_train\online_train_like_14_concate_sample.csv
+action:  click_avatar
+Save to: ./data\online_train\online_train_click_avatar_14_concate_sample.csv
+action:  forward
+Save to: ./data\online_train\online_train_forward_14_concate_sample.csv
+2021-05-24 15:36:30,291 - INFO - Stage: offline_train
+2021-05-24 15:36:30,291 - INFO - Generate sample
+Save to: ./data\offline_train\offline_train_read_comment_12_generate_sample.csv
+Save to: ./data\offline_train\offline_train_like_12_generate_sample.csv
+Save to: ./data\offline_train\offline_train_click_avatar_12_generate_sample.csv
+Save to: ./data\offline_train\offline_train_forward_12_generate_sample.csv
+2021-05-24 15:36:49,045 - INFO - Concat sample with feature
+action:  read_comment
+Save to: ./data\offline_train\offline_train_read_comment_12_concate_sample.csv
+action:  like
+Save to: ./data\offline_train\offline_train_like_12_concate_sample.csv
+action:  click_avatar
+Save to: ./data\offline_train\offline_train_click_avatar_12_concate_sample.csv
+action:  forward
+Save to: ./data\offline_train\offline_train_forward_12_concate_sample.csv
+2021-05-24 15:37:25,456 - INFO - Stage: evaluate
+2021-05-24 15:37:25,456 - INFO - Generate sample
+Save to: ./data\evaluate\evaluate_all_13_generate_sample.csv
+2021-05-24 15:37:31,260 - INFO - Concat sample with feature
+action:  all
+Save to: ./data\evaluate\evaluate_all_13_concate_sample.csv
+2021-05-24 15:37:43,727 - INFO - Stage: submit
+2021-05-24 15:37:43,727 - INFO - Generate sample
+Save to: ./data\submit\submit_all_15_generate_sample.csv
+2021-05-24 15:37:44,646 - INFO - Concat sample with feature
+action:  all
+Save to: ./data\submit\submit_all_15_concate_sample.csv
+Time cost: 201.94 s

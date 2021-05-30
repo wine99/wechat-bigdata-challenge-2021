@@ -1,3 +1,7 @@
+data/
+wechat_algo_data*
+logs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
