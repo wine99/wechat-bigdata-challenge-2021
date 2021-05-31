@@ -72,20 +72,16 @@ if __name__ == '__main__':
         start_epoch = model_pth_dir[-5:-4] + 1
         model.load_state_dict(torch.load(model_pth_dir))
     global_iteration_step = start_epoch * iterations
-    batch_size = config["batch_size"]
 
-    for epoch in range(start_epoch, 2):
+    for epoch in range(start_epoch, 1):  # config["num_epochs"]):
         print(f"\nTraining for epoch {epoch}:")
 
         for i, batch in enumerate(tqdm(train_dataloader)):
 
-            """if i == 3600:
-                break"""
-
             for key in batch:
                 batch[key] = batch[key].cuda()
 
-            task_res, _ = model(batch["aid"], batch["feed_embedding"], batch["statistics_v"],
+            task_res, _ = model(batch["fid"], batch["aid"], batch["feed_embedding"], batch["statistics_v"],
                                 batch["uv_info"], batch["uid"], batch["did"], batch["statistics_u"])
 
             act_loss = [criterion(task_res[i], batch["target"][:, i]) for i in range(len(task_res))]
@@ -96,20 +92,22 @@ if __name__ == '__main__':
             optimizer.step()
 
             summary_writer.add_scalar(
-                "train/total_loss", loss_sum, i + global_iteration_step
+                "train/total_loss", loss_sum, global_iteration_step
             )
             summary_writer.add_scalar(
-                "train/read_loss", act_loss[0], i + global_iteration_step
+                "train/read_loss", act_loss[0], global_iteration_step
             )
             summary_writer.add_scalar(
-                "train/like_loss", act_loss[1], i + global_iteration_step
+                "train/like_loss", act_loss[1], global_iteration_step
             )
             summary_writer.add_scalar(
-                "train/click_loss", act_loss[2], i + global_iteration_step
+                "train/click_loss", act_loss[2], global_iteration_step
             )
             summary_writer.add_scalar(
-                "train/forward_loss", act_loss[3], i + global_iteration_step
+                "train/forward_loss", act_loss[3], global_iteration_step
             )
+
+            global_iteration_step += 1
 
         torch.cuda.empty_cache()
         torch.save(model.state_dict(), args.save_dirpath + "checkpoint_" + str(epoch) + ".pth")

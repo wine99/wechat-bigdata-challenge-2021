@@ -61,7 +61,7 @@ if __name__ == '__main__':
             batch[key] = batch[key].cuda()
 
         with torch.no_grad():
-            task_res, _ = model(batch["aid"], batch["feed_embedding"], batch["statistics_v"],
+            task_res, _ = model(batch["fid"], batch["aid"], batch["feed_embedding"], batch["statistics_v"],
                                 batch["uv_info"], batch["uid"], batch["did"], batch["statistics_u"],
                                 )
 
