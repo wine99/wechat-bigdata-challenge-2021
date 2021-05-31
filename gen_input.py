@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 
 feed_factor = ['authorid', 'videoplayseconds']
-heat_factor = ["read_comment", "like", "click_avatar",  "forward", "comment", "follow", "favorite"]
-user_factor = ["read_comment", "like", "click_avatar",  "forward", "comment", "follow", "favorite"]
+heat_factor = ["read_comment", "like", "click_avatar",  "forward", "favorite", "comment", "follow"]
+user_factor = ["read_comment", "like", "click_avatar",  "forward"]
 action_factor = ['device', 'play', 'stay']
 labels = ['read_comment', 'like', 'click_avatar', 'forward']
 

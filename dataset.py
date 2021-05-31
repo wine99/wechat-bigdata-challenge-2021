@@ -2,7 +2,7 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-statistics_v = ['read_comment_count', 'like_count', 'click_avatar_count', 'forward_count']
+statistics_v = ['read_comment_count', 'like_count', 'click_avatar_count', 'forward_count', 'favorite_count', 'comment_count', 'follow_count']
 statistics_u = ['read_comment_prob', 'like_prob', 'click_avatar_prob', 'forward_prob']
 target = ['read_comment', 'like', 'click_avatar', 'forward']
 # uv_info = ['videoplayseconds', 'play', 'stay']
