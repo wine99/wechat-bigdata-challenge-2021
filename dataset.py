@@ -4,14 +4,16 @@ from torch.utils.data import Dataset, DataLoader
 
 statistics_v = ['read_comment_count', 'like_count', 'click_avatar_count', 'forward_count', 'favorite_count', 'comment_count', 'follow_count']
 statistics_u = ['read_comment_prob', 'like_prob', 'click_avatar_prob', 'forward_prob']
-target = ['read_comment', 'like', 'click_avatar', 'forward']
-# uv_info = ['videoplayseconds', 'play', 'stay']
-uv_info = ['videoplayseconds']
+targets = ['read_comment', 'like', 'click_avatar', 'forward']
+uv_info = ['videoplayseconds', 'play', 'stay']
 
 
 class OurDataset(Dataset):
     def __init__(self, mode='train'):
-        self.whole = pd.read_csv('./data/small_%s.csv' % mode)
+        self.whole = pd.read_csv('./data/input_%s.csv' % mode)
+        if mode == 'test':
+            for target in targets:
+                self.whole[target] = 0
         emb = pd.read_csv('./data/feed_embeddings.csv')
         self.emb_dict = dict(zip(list(emb['feedid'].values),
                                  emb['feed_embedding'].str.split(' ', expand=True).iloc[:, :-1].astype('float32').values.tolist()))
@@ -29,7 +31,7 @@ class OurDataset(Dataset):
             'uid': torch.tensor(record['userid']).long(),
             'did': torch.tensor(record['device']).long(),
             'statistics_u': torch.tensor(record[statistics_u].astype('float32').values),
-            'target': torch.tensor(record[target].astype('int64').values).long()
+            'target': torch.tensor(record[targets].astype('int64').values).long()
         }
         return item
 

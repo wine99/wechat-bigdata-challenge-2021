@@ -17,7 +17,9 @@ def prepare_feed():
     # feed['videoplayseconds'] = feed['videoplayseconds'].where(feed['videoplayseconds'] <= 61, 61)
     grouped = user_action.groupby(by=['feedid'])
     for col in heat_factor:
-        feed = feed.merge(grouped[col].sum().reset_index().rename(columns={col: col + '_count'}), on='feedid')
+        feed = feed.merge(grouped[col].sum().reset_index().rename(columns={col: col + '_count'}),
+                          on='feedid', how='left')
+    feed.to_csv('./data/feed_stat.csv', index=False)
     return feed
 
 
@@ -27,8 +29,9 @@ def prepare_user():
     grouped = user_action.groupby(by=['userid'])
     for col in user_factor:
         stat = stat.merge(grouped[col].mean().round(decimals=6).reset_index().rename(columns={col: col + '_prob'}),
-                          on='userid')
+                          on='userid', how='left')
         # stat = stat.merge(grouped[col].sum().reset_index().rename(columns={col: col + '_count'}), on='userid')
+    stat.to_csv('./data/user_stat.csv', index=False)
     return stat
 
 
@@ -59,13 +62,29 @@ def prepare_input():
     return inputs
 
 
-def prepare_label():
-    return user_action[labels]
+def prepare_test():
+    feed = prepare_feed()
+    user_stat = prepare_user()
+    tests = pd.read_csv('./data/wechat_algo_data1/test_a.csv')
+    tests = tests.merge(feed, on='feedid', how='left')
+    tests = tests.merge(user_stat, on='userid', how='left')
+    tests['play'] = 0
+    tests['stay'] = 0
+    for target in labels:
+        tests[target] = None
+    for feed_stat in heat_factor:
+        tests[feed_stat+'_count'] = tests[feed_stat+'_count'].astype('int64').fillna(0)
+    return tests
+
+
+# def prepare_label():
+#     return user_action[labels]
 
 
 if __name__ == '__main__':
     inputs = prepare_input()
     inputs[inputs.date_ <= 12].to_csv('./data/input_train.csv', index=False)
     inputs[inputs.date_ >= 13].to_csv('./data/input_val.csv', index=False)
+    prepare_test().to_csv('./data/input_test.csv', index=False)
     # labels = prepare_label()
     # prepare_label().to_csv('./data/label_train.csv')
