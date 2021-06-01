@@ -1,3 +1,5 @@
+import time
+import pandas as pd
 import torch
 
 import argparse
@@ -28,10 +30,13 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
+    # change mode to 'test' if submitting
+    mode = 'val'
+
     args = parser.parse_args()
     config = yaml.load(open(args.config_yml))
 
-    val_dataset = OurDataset(mode='val')
+    val_dataset = OurDataset(mode=mode)
     val_dataloader = DataLoader(
         val_dataset,
         batch_size=config["batch_size"],
@@ -51,6 +56,7 @@ if __name__ == '__main__':
     task_num = 4
 
     user_id_list = []
+    feed_id_list = []
     Preds = [[] for i in range(task_num)]
     Labels = [[] for i in range(task_num)]
 
@@ -67,10 +73,22 @@ if __name__ == '__main__':
 
         uid_list = batch["uid"].tolist()  # batch_size,
         user_id_list = user_id_list + uid_list
+        if mode == 'test':
+            feed_id_list = feed_id_list + batch['fid'].tolist()
 
         for j in range(task_num):
             Preds[j] = Preds[j] + task_res[j][:, 1].tolist()  # batch_size,
             Labels[j] = Labels[j] + batch["target"][:, j].tolist()  # batch_size,
+
+    if mode == 'test':
+        submit = pd.DataFrame([user_id_list,
+                               feed_id_list,
+                               Preds[0],
+                               Preds[1],
+                               Preds[2],
+                               Preds[3]]).T
+        submit.columns = ['userid', 'feedid', 'read_comment', 'like', 'click_avatar', 'forward']
+        submit.to_csv('./data/submit/submit_' + str(int(time.time())) + '.csv', index=False)
 
     uAUC_list = [uAUC(Labels[i], Preds[i], user_id_list) for i in range(task_num)]
     print(uAUC_list)

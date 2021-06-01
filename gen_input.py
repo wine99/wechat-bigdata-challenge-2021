@@ -70,6 +70,7 @@ def prepare_test():
     tests = tests.merge(user_stat, on='userid', how='left')
     tests['play'] = 0
     tests['stay'] = 0
+    tests['device'] = tests['device'] - 1
     for target in labels:
         tests[target] = None
     for feed_stat in heat_factor:
