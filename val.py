@@ -7,7 +7,7 @@ import yaml
 from tqdm import tqdm
 
 from NET import Net
-from dataset import OurDataset, DataLoader
+from dataset import generate_dataset, DataLoader
 from evaluation import uAUC
 
 parser = argparse.ArgumentParser()
@@ -18,7 +18,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--load-pthpath",
-    default="checkpoints/checkpoint_0.pth",
+    default=[None, None, None, None],
     help="To continue training, path to .pth file of saved checkpoint.",
 )
 
@@ -30,65 +30,73 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
-    # change mode to 'test' if submitting
-    mode = 'val'
+    # change mode to 'submit' if submitting
+    mode = 'submit'
 
     args = parser.parse_args()
     config = yaml.load(open(args.config_yml))
 
-    val_dataset = OurDataset(mode=mode)
-    val_dataloader = DataLoader(
-        val_dataset,
+    val_dataset = generate_dataset(mode=mode)
+    val_dataloader = [DataLoader(
+        val_dataset[i],
         batch_size=config["batch_size"],
         num_workers=1,
         shuffle=False,
-    )
+    ) for i in range(config["task_num"])]
 
-    model = Net(config["task_num"], config["exp_per_task"], config["shared_num"],
-                config["expert_size"], config["tower_size"], config["level_number"]).cuda()
+    model = [Net(config["task_num"], config["exp_per_task"], config["shared_num"],
+                 config["expert_size"], config["tower_size"], config["level_number"]).cuda()
+             for i in range(config["task_num"])]
 
     model_pth_dir = args.load_pthpath
-    if model_pth_dir is not None:
-        model.load_state_dict(torch.load(model_pth_dir))
-    else:
-        print("Pth dir error.")
 
-    task_num = 4
+    for i in range(config["task_num"]):
+        if model_pth_dir[i] is not None:
+            model[i].load_state_dict(torch.load(model_pth_dir[i]))
+        else:
+            print(f"Task {i} pth dir error.")
+            exit()
 
-    user_id_list = []
-    feed_id_list = []
-    Preds = [[] for i in range(task_num)]
-    Labels = [[] for i in range(task_num)]
+    uAUC_list = []
+    submit_lists = []
 
-    model.eval()
-    for i, batch in enumerate(tqdm(val_dataloader)):
+    for n in range(config["task_num"]):
+        user_id_list = []
+        feed_id_list = []
+        Preds = []
+        Labels = []
 
-        for key in batch:
-            batch[key] = batch[key].cuda()
+        model[n].eval()
 
-        with torch.no_grad():
-            task_res, _ = model(batch["fid"], batch["aid"], batch["feed_embedding"], batch["statistics_v"],
-                                batch["uv_info"], batch["uid"], batch["did"], batch["statistics_u"],
-                                )
+        for i, batch in enumerate(tqdm(val_dataloader[n])):
+            for key in batch:
+                batch[key] = batch[key].cuda()
 
-        uid_list = batch["uid"].tolist()  # batch_size,
-        user_id_list = user_id_list + uid_list
-        if mode == 'test':
-            feed_id_list = feed_id_list + batch['fid'].tolist()
+            with torch.no_grad():
+                task_res = model[n](batch["fid"], batch["aid"], batch["feed_embedding"], batch["statistics_v"],
+                                    batch["uv_info"], batch["uid"], batch["did"], batch["statistics_u"],
+                                    )
 
-        for j in range(task_num):
-            Preds[j] = Preds[j] + task_res[j][:, 1].tolist()  # batch_size,
-            Labels[j] = Labels[j] + batch["target"][:, j].tolist()  # batch_size,
+            uid_list = batch["uid"].tolist()  # batch_size,
+            user_id_list = user_id_list + uid_list
 
-    if mode == 'test':
-        submit = pd.DataFrame([user_id_list,
-                               feed_id_list,
-                               Preds[0],
-                               Preds[1],
-                               Preds[2],
-                               Preds[3]]).T
+            if mode == 'submit':
+                feed_id_list = feed_id_list + batch['fid'].tolist()
+
+            Preds = Preds + task_res[:, 1].tolist()  # batch_size,
+            Labels = Labels + batch["target"].tolist()  # batch_size,
+
+        if mode == 'submit':
+            if n == config["task_num"] - 1:
+                submit_lists = [user_id_list, feed_id_list] + submit_lists
+            else:
+                submit_lists.append(Preds)
+        else:
+            uAUC_list.append(uAUC(Labels, Preds, user_id_list))
+
+    if mode == 'submit':
+        submit = pd.DataFrame(submit_lists).T
         submit.columns = ['userid', 'feedid', 'read_comment', 'like', 'click_avatar', 'forward']
         submit.to_csv('./data/submit/submit_' + str(int(time.time())) + '.csv', index=False)
-
-    uAUC_list = [uAUC(Labels[i], Preds[i], user_id_list) for i in range(task_num)]
-    print(uAUC_list)
+    else:
+        print(uAUC_list)

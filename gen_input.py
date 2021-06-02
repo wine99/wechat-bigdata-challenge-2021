@@ -3,7 +3,8 @@ import pandas as pd
 
 feed_factor = ['authorid', 'videoplayseconds']
 heat_factor = ["read_comment", "like", "click_avatar",  "forward", "favorite", "comment", "follow"]
-user_factor = ["read_comment", "like", "click_avatar",  "forward"]
+# user_factor = ["read_comment", "like", "click_avatar",  "forward"]
+user_factor = ["read_comment", "like", "click_avatar",  "forward", "favorite", "comment", "follow"]
 action_factor = ['device', 'play', 'stay']
 labels = ['read_comment', 'like', 'click_avatar', 'forward']
 
@@ -19,6 +20,7 @@ def prepare_feed():
     for col in heat_factor:
         feed = feed.merge(grouped[col].sum().reset_index().rename(columns={col: col + '_count'}),
                           on='feedid', how='left')
+    feed.fillna(0)
     feed.to_csv('./data/feed_stat.csv', index=False)
     return feed
 
@@ -31,6 +33,7 @@ def prepare_user():
         stat = stat.merge(grouped[col].mean().round(decimals=6).reset_index().rename(columns={col: col + '_prob'}),
                           on='userid', how='left')
         # stat = stat.merge(grouped[col].sum().reset_index().rename(columns={col: col + '_count'}), on='userid')
+    stat.fillna(0)
     stat.to_csv('./data/user_stat.csv', index=False)
     return stat
 
@@ -89,3 +92,13 @@ if __name__ == '__main__':
     prepare_test().to_csv('./data/input_test.csv', index=False)
     # labels = prepare_label()
     # prepare_label().to_csv('./data/label_train.csv')
+
+
+# import pandas as pd
+# user_factor = ["read_comment", "like", "click_avatar",  "forward", "favorite", "comment", "follow"]
+# user_stat = pd.read_csv('./data/user_stat.csv')
+# def fn(filename):
+#     file = pd.read_csv(filename)
+#     file.drop(columns=[f'{stat}sum_user' for stat in user_factor], inplace=True)
+#     file = file.merge(user_stat, on='userid', how='left')
+#     file.to_csv(filename, index=False)
