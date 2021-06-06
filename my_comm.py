@@ -74,6 +74,8 @@ def generate_sample(stage='offline_train'):
         df.drop(columns=['positive'], inplace=True)
         df['play'] = df['play'] / 1000
         df['stay'] = df['stay'] / 1000
+        df['play'] = np.log(df['play'] + 1.0)
+        df['stay'] = np.log(df['stay'] + 1.0)
 
     feed_info = pd.read_csv(FEED_INFO)[FEED_FEATURE]
     feed_info[["authorid", "bgm_song_id", "bgm_singer_id"]] += 1
