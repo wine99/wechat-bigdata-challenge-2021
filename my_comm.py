@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 
 # 存储数据的根目录
@@ -45,6 +46,8 @@ def generate_sample(stage='offline_train'):
         df = df[df['date_'] == day]
         df['play'] = df['play'] / 1000
         df['stay'] = df['stay'] / 1000
+        df['play'] = np.log(df['play'] + 1.0)
+        df['stay'] = np.log(df['stay'] + 1.0)
     elif stage == 'submit':
         # 线上提交
         df['date_'] = 15
@@ -95,9 +98,12 @@ def generate_sample(stage='offline_train'):
     user_prob_feature_col = [b + "mean" for b in FEA_COLUMN_LIST]
     df[feed_feature_col] = df[feed_feature_col].fillna(0.0)
     df[user_feature_col] = df[user_feature_col].fillna(0.0)
+    df[feed_feature_col] = np.log(df[feed_feature_col] + 1.0)
+    df[user_feature_col] = np.log(df[user_feature_col] + 1.0)
     df[user_prob_feature_col] = df[user_prob_feature_col].fillna(1e-5)
-    df[feed_feature_col] = df[feed_feature_col].astype(int)
-    df[user_feature_col] = df[user_feature_col].astype(int)
+    df["videoplayseconds"] = np.log(df["videoplayseconds"] + 1.0)
+    # df[feed_feature_col] = df[feed_feature_col].astype(int)
+    # df[user_feature_col] = df[user_feature_col].astype(int)
     df[["authorid", "bgm_song_id", "bgm_singer_id"]] = \
         df[["authorid", "bgm_song_id", "bgm_singer_id"]].astype(int)
     file_name = os.path.join(stage_dir, stage + "_" + str(day) + ".csv")
