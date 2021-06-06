@@ -77,11 +77,11 @@ def generate_sample(stage='offline_train'):
     feed_info[["authorid", "bgm_song_id", "bgm_singer_id", "videoplayseconds"]] = \
         feed_info[["authorid", "bgm_song_id", "bgm_singer_id", "videoplayseconds"]].fillna(0)
     feed_info = feed_info.set_index('feedid')
-    user_prob_feature = pd.read_csv(os.path.join(ROOT_PATH, 'user_stat.csv'))
-    user_prob_feature = user_prob_feature.set_index('userid')
     # 基于userid统计的历史行为的次数
     user_date_feature = pd.read_csv(os.path.join(ROOT_PATH, "feature", "userid_feature.csv"))
     user_date_feature = user_date_feature.set_index(["userid", "date_"])
+    user_date_prob_feature = pd.read_csv(os.path.join(ROOT_PATH, "feature", "userid_prob_feature.csv"))
+    user_date_prob_feature = user_date_prob_feature.set_index(["userid", "date_"])
     # 基于feedid统计的历史行为的次数
     feed_date_feature = pd.read_csv(os.path.join(ROOT_PATH, "feature", "feedid_feature.csv"))
     feed_date_feature = feed_date_feature.set_index(["feedid", "date_"])
@@ -89,11 +89,13 @@ def generate_sample(stage='offline_train'):
     df = df.merge(feed_info, on='feedid', how='left')
     df = df.merge(feed_date_feature, on=['feedid', 'date_'], how='left')
     df = df.merge(user_date_feature, on=['userid', 'date_'], how='left')
-    df = df.merge(user_prob_feature, on='userid', how='left')
+    df = df.merge(user_date_prob_feature, on=['userid', 'date_'], how='left')
     feed_feature_col = [b + "sum" for b in FEA_COLUMN_LIST]
     user_feature_col = [b + "sum_user" for b in FEA_COLUMN_LIST]
+    user_prob_feature_col = [b + "mean" for b in FEA_COLUMN_LIST]
     df[feed_feature_col] = df[feed_feature_col].fillna(0.0)
     df[user_feature_col] = df[user_feature_col].fillna(0.0)
+    df[user_prob_feature_col] = df[user_prob_feature_col].fillna(1e-5)
     df[feed_feature_col] = df[feed_feature_col].astype(int)
     df[user_feature_col] = df[user_feature_col].astype(int)
     df[["authorid", "bgm_song_id", "bgm_singer_id"]] = \
