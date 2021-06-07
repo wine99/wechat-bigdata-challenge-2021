@@ -9,13 +9,13 @@ from tensorflow import feature_column as fc
 from comm import ACTION_LIST, STAGE_END_DAY, FEA_COLUMN_LIST
 from evaluation import uAUC, compute_weighted_score
 
-ACTION_LIST = ['read_comment']
+ACTION_LIST = ['read_comment', 'like', 'click_avatar', 'forward']
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('model_checkpoint_dir', './data/model', 'model dir')
-flags.DEFINE_string('root_path', './data/', 'data dir')
+flags.DEFINE_string('model_checkpoint_dir', './model', 'model dir')
+flags.DEFINE_string('root_path', '/openbayes/input/input0/', 'data dir')
 flags.DEFINE_integer('batch_size', 128, 'batch_size')
 flags.DEFINE_integer('embed_dim', 10, 'embed_dim')
 flags.DEFINE_float('learning_rate', 0.1, 'learning_rate')
@@ -107,6 +107,7 @@ class WideAndDeep(object):
         """
         file_name = "{stage}_{action}_{day}_concate_sample.csv".format(stage=self.stage, action=self.action,
                                                                       day=STAGE_END_DAY[self.stage])
+        file_name = f'{self.stage}_{STAGE_END_DAY[self.stage]}.csv'
         stage_dir = os.path.join(FLAGS.root_path, self.stage, file_name)
         df = pd.read_csv(stage_dir)
         self.estimator.train(
@@ -125,6 +126,7 @@ class WideAndDeep(object):
             action = "all"
         file_name = "{stage}_{action}_{day}_concate_sample.csv".format(stage=self.stage, action=action,
                                                                       day=STAGE_END_DAY[self.stage])
+        file_name = f'{self.stage}_{STAGE_END_DAY[self.stage]}.csv'
         evaluate_dir = os.path.join(FLAGS.root_path, self.stage, file_name)
         df = pd.read_csv(evaluate_dir)
         userid_list = df['userid'].astype(str).tolist()
@@ -144,6 +146,7 @@ class WideAndDeep(object):
         '''
         file_name = "{stage}_{action}_{day}_concate_sample.csv".format(stage=self.stage, action="all",
                                                                       day=STAGE_END_DAY[self.stage])
+        file_name = f'{self.stage}_{STAGE_END_DAY[self.stage]}.csv'
         submit_dir = os.path.join(FLAGS.root_path, self.stage, file_name)
         df = pd.read_csv(submit_dir)
         t = time.time()
